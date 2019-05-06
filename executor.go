@@ -120,7 +120,7 @@ func (e *Executor) processActions() error {
 		}
 		ok, err := e.MustExecuteCommand(result)
 		if err != nil {
-			log.Printf("Failed to check query reqult: %v", err)
+			log.Printf("Failed to check query result: %v", err)
 			continue
 		}
 		if !ok {
