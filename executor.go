@@ -167,8 +167,8 @@ func (e *Executor) Run() error {
 			return err
 		case <-next:
 			e.processActions()
-			next = time.After(e.c.QueryInterval)
-			e.log.Debugf("Sleeping for a %s...", e.c.QueryInterval)
+			next = time.After(e.c.ActionsInterval)
+			e.log.Debugf("Sleeping for a %s...", e.c.ActionsInterval)
 		}
 	}
 }

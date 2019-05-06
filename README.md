@@ -4,7 +4,7 @@
 
 ```yaml
 ---
-queryInterval: 10m
+actionsInterval: 10m
 cooldownPeriod: 30m
 commandTimeout: 5m
 prometheusURL: http://prometheus.local/

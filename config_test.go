@@ -40,16 +40,16 @@ func TestValidate_Config(t *testing.T) {
 		t.Error("Must be an error, but got nil")
 	}
 	c = &Config{
-		Actions:       actions,
-		QueryInterval: time.Minute,
+		Actions:         actions,
+		ActionsInterval: time.Minute,
 	}
 	if err := c.Validate(); err == nil {
 		t.Error("Must be an error, but got nil")
 	}
 	c = &Config{
-		Actions:        actions,
-		QueryInterval:  time.Minute,
-		СommandTimeout: time.Minute,
+		Actions:         actions,
+		ActionsInterval: time.Minute,
+		СommandTimeout:  time.Minute,
 	}
 	if err := c.Validate(); err == nil {
 		t.Error("Must be an error, but got nil")
