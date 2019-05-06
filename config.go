@@ -13,6 +13,7 @@ type Config struct {
 	PrometheusURL  string        `yaml:"prometheusURL"`
 	QueryInterval  time.Duration `yaml:"queryInterval"`
 	СommandTimeout time.Duration `yaml:"commandTimeout"`
+	CooldownPeriod time.Duration `yaml:"cooldownPeriod"`
 	Actions        []*Action
 }
 
@@ -21,6 +22,7 @@ type Action struct {
 	Command      []string
 	Expr         string
 	compiledExpr string
+	lastExecTime time.Time
 }
 
 func LoadConfig(filename string) (*Config, error) {

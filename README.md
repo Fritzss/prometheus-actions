@@ -5,6 +5,7 @@
 ```yaml
 ---
 queryInterval: 10m
+cooldownPeriod: 30m
 commandTimeout: 5m
 prometheusURL: http://prometheus.local/
 actions:
@@ -17,5 +18,5 @@ actions:
     command:
       - bash
       - -c
-      - "FORCE_IMAGE_REMOVAL=1 GRACE_PERIOD_SECONDS=7200 /usr/sbin/docker-gc"
+      - "FORCE_IMAGE_REMOVAL=1 GRACE_PERIOD_SECONDS=3600 /usr/sbin/docker-gc"
 ```
