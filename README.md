@@ -10,7 +10,7 @@ commandTimeout: 5m
 prometheusURL: http://prometheus.local/
 actions:
   - name: Docker GC
-    # Only Vector supported for now
+    # Only Vectors supported for now
     expr: |
       (
         node_filesystem_free{instance="{{ .Hostname }}", mountpoint="/var/lib/docker"} /
