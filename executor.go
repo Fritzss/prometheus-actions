@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -18,16 +19,18 @@ import (
 )
 
 type Executor struct {
-	c      *Config
-	f      *Fingerprint
-	log    *logrus.Logger
-	promQL v1.API
+	c       *Config
+	f       *Fingerprint
+	log     *logrus.Logger
+	environ []string
+	promQL  v1.API
 }
 
 func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
 	e := &Executor{
-		c:   config,
-		log: log,
+		c:       config,
+		log:     log,
+		environ: os.Environ(),
 	}
 	if err := e.setupFingerprint(); err != nil {
 		return nil, err
@@ -103,6 +106,7 @@ func (e *Executor) ExecuteCommand(command []string) error {
 	} else {
 		cmd = exec.CommandContext(ctx, command[0], command[1:]...)
 	}
+	cmd.Env = e.environ
 	cmd.Stderr = e.log.WithField("src", "cmd").WriterLevel(logrus.ErrorLevel)
 	cmd.Stdout = e.log.WithField("src", "cmd").WriterLevel(logrus.DebugLevel)
 	err := cmd.Run()
