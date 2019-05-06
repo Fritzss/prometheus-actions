@@ -12,8 +12,8 @@ actions:
   - name: Docker GC
     expr: |
       (
-        node_filesystem_free{instance="{{ .Hostname }}",mountpoint="/var/lib/docker"} /
-        node_filesystem_size{instance="{{ .Hostname }}",mountpoint="/var/lib/docker"}
+        node_filesystem_free{instance="{{ .Hostname }}", mountpoint="/var/lib/docker"} /
+        node_filesystem_size{instance="{{ .Hostname }}", mountpoint="/var/lib/docker"}
       ) * 100 < 10
     command:
       - bash
