@@ -77,7 +77,7 @@ func (e *Executor) ExecuteQuery(q string) (model.Value, error) {
 	return result, nil
 }
 
-func (e *Executor) MustExecuteCommand(result model.Value) (bool, error) {
+func (e *Executor) CanExecuteCommand(result model.Value) (bool, error) {
 	switch {
 	case result.Type() == model.ValVector:
 		samples := result.(model.Vector).Len()
@@ -122,7 +122,7 @@ func (e *Executor) processActions() error {
 			log.Printf("Failed to query: %v", err)
 			continue
 		}
-		canExecute, err := e.MustExecuteCommand(result)
+		canExecute, err := e.CanExecuteCommand(result)
 		if err != nil {
 			log.Printf("Failed to check query result: %v", err)
 			continue
