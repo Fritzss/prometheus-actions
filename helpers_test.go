@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStandardizeSpaces(t *testing.T) {
 	input := `line 1

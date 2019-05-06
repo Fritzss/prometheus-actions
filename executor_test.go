@@ -3,10 +3,13 @@ package main
 import (
 	"testing"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func TestExecuteCommand(t *testing.T) {
 	e := &Executor{
+		log: logrus.New(),
 		c: &Config{
 			СommandTimeout: 100 * time.Millisecond,
 		},

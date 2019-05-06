@@ -3,11 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
+	"net/http"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/prometheus/client_golang/api"
 	"github.com/prometheus/client_golang/api/prometheus/v1"
@@ -17,12 +20,14 @@ import (
 type Executor struct {
 	c      *Config
 	f      *Fingerprint
+	log    *logrus.Logger
 	promQL v1.API
 }
 
-func NewExecutor(config *Config) (*Executor, error) {
+func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
 	e := &Executor{
-		c: config,
+		c:   config,
+		log: log,
 	}
 	if err := e.setupFingerprint(); err != nil {
 		return nil, err
@@ -98,8 +103,8 @@ func (e *Executor) ExecuteCommand(command []string) error {
 	} else {
 		cmd = exec.CommandContext(ctx, command[0], command[1:]...)
 	}
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
+	cmd.Stderr = e.log.WithField("src", "cmd").WriterLevel(logrus.ErrorLevel)
+	cmd.Stdout = e.log.WithField("src", "cmd").WriterLevel(logrus.DebugLevel)
 	err := cmd.Run()
 	if ctx.Err() == context.DeadlineExceeded {
 		return ctx.Err()
@@ -110,44 +115,56 @@ func (e *Executor) ExecuteCommand(command []string) error {
 	return nil
 }
 
-func (e *Executor) processActions() error {
+func (e *Executor) processActions() {
 	for _, action := range e.c.Actions {
+		logEntry := e.log.WithField("action", action.String())
 		if limited := action.IsCooldownLimited(e.c.CooldownPeriod); limited {
-			log.Printf("Can't process %s due cooldown period", action.String())
+			logEntry.Infof("Can't process due cooldown period")
 			continue
 		}
-		log.Printf("Querying '%s' for %s...", action.compiledExpr, action.String())
+		logEntry.Debugf("Querying '%s'...", action.compiledExpr)
 		result, err := e.ExecuteQuery(action.compiledExpr)
 		if err != nil {
-			log.Printf("Failed to query: %v", err)
+			logEntry.Errorf("Failed to query: %v", err)
 			continue
 		}
 		canExecute, err := e.CanExecuteCommand(result)
 		if err != nil {
-			log.Printf("Failed to check query result: %v", err)
+			logEntry.Errorf("Failed to check query result: %v", err)
 			continue
 		}
 		if !canExecute {
 			continue
 		}
-		log.Printf("Executing '%s' for %s...", strings.Join(action.Command, " "), action.String())
+		logEntry.Debugf("Executing '%s'...", strings.Join(action.Command, " "))
 		action.lastExecTime = time.Now()
 		if err := e.ExecuteCommand(action.Command); err != nil {
-			log.Printf("Failed to execute: %v", err)
+			logEntry.Errorf("Failed to execute: %v", err)
 			continue
 		}
-		log.Printf("Done with %s", action.String())
+		logEntry.Debug("Done")
 	}
-	return nil
+}
+
+func (e *Executor) serveRequests() error {
+	http.Handle("/metrics", prometheus.Handler())
+	return http.ListenAndServe(e.c.ListenAddress, nil)
 }
 
 func (e *Executor) Run() error {
+	errCh := make(chan error)
+	go func() {
+		errCh <- e.serveRequests()
+	}()
+	next := time.After(time.Second)
 	for {
-		err := e.processActions()
-		if err != nil {
+		select {
+		case err := <-errCh:
 			return err
+		case <-next:
+			e.processActions()
+			next = time.After(e.c.QueryInterval)
+			e.log.Debugf("Sleeping for a %s...", e.c.QueryInterval)
 		}
-		log.Printf("Sleeping for a %s...", e.c.QueryInterval)
-		time.Sleep(e.c.QueryInterval)
 	}
 }

@@ -9,7 +9,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	defaultListenAddress = "0.0.0.0:9333"
+)
+
 type Config struct {
+	ListenAddress  string        `yaml:"listenAddress"`
 	PrometheusURL  string        `yaml:"prometheusURL"`
 	QueryInterval  time.Duration `yaml:"queryInterval"`
 	СommandTimeout time.Duration `yaml:"commandTimeout"`
@@ -27,7 +32,14 @@ func LoadConfig(filename string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	config.specifyDefaults()
 	return config, nil
+}
+
+func (c *Config) specifyDefaults() {
+	if len(c.ListenAddress) == 0 {
+		c.ListenAddress = defaultListenAddress
+	}
 }
 
 func (c *Config) Validate() error {
