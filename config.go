@@ -17,14 +17,6 @@ type Config struct {
 	Actions        []*Action
 }
 
-type Action struct {
-	Name         string
-	Command      []string
-	Expr         string
-	compiledExpr string
-	lastExecTime time.Time
-}
-
 func LoadConfig(filename string) (*Config, error) {
 	out, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -36,16 +28,6 @@ func LoadConfig(filename string) (*Config, error) {
 		return nil, err
 	}
 	return config, nil
-}
-
-func (a *Action) Validate() error {
-	if len(a.Expr) == 0 {
-		return errors.New("Action.Expr must be specified")
-	}
-	if len(a.Command) == 0 {
-		return errors.New("Action.Command must be specified")
-	}
-	return nil
 }
 
 func (c *Config) Validate() error {
@@ -65,11 +47,4 @@ func (c *Config) Validate() error {
 		}
 	}
 	return nil
-}
-
-func (a *Action) String() string {
-	if len(a.Name) == 0 {
-		return "unnamed"
-	}
-	return a.Name
 }

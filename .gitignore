@@ -12,3 +12,4 @@
 *.out
 
 /prometheus-actions.yaml
+coverage.txt
