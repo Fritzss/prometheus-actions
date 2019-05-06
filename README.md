@@ -8,6 +8,7 @@ queryInterval: 10m
 cooldownPeriod: 30m
 commandTimeout: 5m
 prometheusURL: http://prometheus.local/
+listenAddress: 0.0.0.0:9333
 actions:
   - name: Docker GC
     # Only Vectors supported for now
