@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestValidate_Action(t *testing.T) {
 	a := &Action{}
@@ -34,5 +37,24 @@ func TestString(t *testing.T) {
 	}
 	if a.String() != "name" {
 		t.Errorf("Must be name, but got %s", a.String())
+	}
+}
+
+func TestIsCooldownLimited(t *testing.T) {
+	a := &Action{}
+	if limited := a.IsCooldownLimited(10 * time.Minute); limited {
+		t.Error("Must be false, but got true")
+	}
+	a = &Action{
+		lastExecTime: time.Now().Add(-15 * time.Minute),
+	}
+	if limited := a.IsCooldownLimited(10 * time.Minute); limited {
+		t.Error("Must be false, but got true")
+	}
+	a = &Action{
+		lastExecTime: time.Now(),
+	}
+	if limited := a.IsCooldownLimited(10 * time.Minute); !limited {
+		t.Error("Must be true, but got false")
 	}
 }

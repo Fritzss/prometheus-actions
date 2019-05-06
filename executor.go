@@ -110,19 +110,9 @@ func (e *Executor) ExecuteCommand(command []string) error {
 	return nil
 }
 
-func (e *Executor) IsCooldownLimited(a *Action) bool {
-	if a.lastExecTime.IsZero() {
-		return false
-	}
-	if a.lastExecTime.Add(e.c.CooldownPeriod).Before(time.Now()) {
-		return false
-	}
-	return true
-}
-
 func (e *Executor) processActions() error {
 	for _, action := range e.c.Actions {
-		if limited := e.IsCooldownLimited(action); limited {
+		if limited := action.IsCooldownLimited(e.c.CooldownPeriod); limited {
 			log.Printf("Can't process %s due cooldown period", action.String())
 			continue
 		}

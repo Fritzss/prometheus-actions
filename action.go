@@ -29,3 +29,13 @@ func (a *Action) String() string {
 	}
 	return a.Name
 }
+
+func (a *Action) IsCooldownLimited(p time.Duration) bool {
+	if a.lastExecTime.IsZero() {
+		return false
+	}
+	if a.lastExecTime.Add(p).Before(time.Now()) {
+		return false
+	}
+	return true
+}
