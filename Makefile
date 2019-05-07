@@ -40,10 +40,14 @@ tarball: promu
 
 tarballs: promu
 	@echo ">> building crossbuild"
-	@$(PROMU) crossbuild 
+	@$(PROMU) crossbuild
 	@echo ">> building crossbuild tarballs"
 	@$(PROMU) crossbuild tarballs 
-	
+
+release: promu
+	@echo ">> releasing tarballs"
+	@$(PROMU) release .tarballs
+
 docker: build
 	@echo ">> building docker image"
 	@docker build -t "$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
