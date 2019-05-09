@@ -25,22 +25,15 @@ actions:
 
 ## Expression template variables
 
-* `OSName` – One of ubuntu, linuxmint, and so on
-* `OSFamily` – One of debian, rhel, and so on
-* `OSVersion` – Version of the complete OS
-* `KernelName` – One of darwin, freebsd, linux, and so on
-* `KernelVersion` – Version of the OS kernel (if available)
-* `Hostname`
+* `OSName` – One of ubuntu, linuxmint, and so on;
+* `OSFamily` – One of debian, rhel, and so on;
+* `OSVersion` – Version of the complete OS;
+* `KernelName` – One of darwin, freebsd, linux, and so on;
+* `KernelVersion` – Version of the OS kernel (if available);
+* `Hostname`.
 
 ## Expression template functions
 
-* `replace`
-* `default`
-* `length`
-* `lower`
-* `upper`
-* `urlencode`
-* `trim`
-* `yesno`
+Replace, default, length, lower, upper, urlencode, trim, yesno.
 
 See [template_test.go](template_test.go) for examples.
