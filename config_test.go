@@ -58,4 +58,8 @@ func TestValidate_Config(t *testing.T) {
 	if err := c.Validate(); err != nil {
 		t.Error(err)
 	}
+	c.Actions = append(c.Actions, c.Actions[0])
+	if err := c.Validate(); err == nil {
+		t.Error("Must be an error, but got nil")
+	}
 }

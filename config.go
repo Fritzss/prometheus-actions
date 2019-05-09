@@ -52,11 +52,16 @@ func (c *Config) Validate() error {
 	if c.СommandTimeout <= time.Second {
 		return fmt.Errorf("СommandTimeout must be greater than second")
 	}
+	uniqueActions := make(map[string]bool)
 	for i, action := range c.Actions {
 		err := action.Validate()
 		if err != nil {
 			return fmt.Errorf("Action %d error: %v", i, err)
 		}
+		if _, ok := uniqueActions[action.Name]; ok {
+			return fmt.Errorf("Duplicate of %s action", action.Name)
+		}
+		uniqueActions[action.Name] = true
 	}
 	return nil
 }

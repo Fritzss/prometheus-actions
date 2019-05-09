@@ -126,12 +126,17 @@ func (e *Executor) processActions() {
 			logEntry.Infof("Can't process due cooldown period")
 			continue
 		}
+
 		logEntry.Debugf("Querying '%s'...", action.compiledExpr)
+		t0 := time.Now()
 		result, err := e.ExecuteQuery(action.compiledExpr)
+		promRequestDuration.WithLabelValues(action.Name).Observe(time.Since(t0).Seconds())
 		if err != nil {
+			promRequestErrorsCount.WithLabelValues(action.Name).Inc()
 			logEntry.Errorf("Failed to query: %v", err)
 			continue
 		}
+
 		canExecute, err := e.CanExecuteCommand(result)
 		if err != nil {
 			logEntry.Errorf("Failed to check query result: %v", err)
@@ -140,12 +145,19 @@ func (e *Executor) processActions() {
 		if !canExecute {
 			continue
 		}
+
 		logEntry.Debugf("Executing '%s'...", strings.Join(action.Command, " "))
 		action.lastExecTime = time.Now()
-		if err := e.ExecuteCommand(action.Command); err != nil {
+
+		t1 := time.Now()
+		err = e.ExecuteCommand(action.Command)
+		cmdExecuteDuration.WithLabelValues(action.Name).Observe(time.Since(t1).Seconds())
+		if err != nil {
+			cmdExecuteErrorsCount.WithLabelValues(action.Name).Inc()
 			logEntry.Errorf("Failed to execute: %v", err)
 			continue
 		}
+
 		logEntry.Debug("Done")
 	}
 }
