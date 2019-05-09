@@ -23,7 +23,7 @@ actions:
       - "FORCE_IMAGE_REMOVAL=1 GRACE_PERIOD_SECONDS=3600 /usr/sbin/docker-gc"
 ```
 
-## Expression template variables
+## Template variables
 
 * `OSName` – One of ubuntu, linuxmint, and so on;
 * `OSFamily` – One of debian, rhel, and so on;
@@ -32,7 +32,7 @@ actions:
 * `KernelVersion` – Version of the OS kernel (if available);
 * `Hostname`.
 
-## Expression template functions
+## Template functions
 
 Replace, default, length, lower, upper, urlencode, trim, yesno.
 
