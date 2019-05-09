@@ -37,3 +37,7 @@ actions:
 Replace, default, length, lower, upper, urlencode, trim, yesno.
 
 See [template_test.go](template_test.go) for examples.
+
+## Links
+
+* [Quering Prometheus](https://prometheus.io/docs/prometheus/latest/querying/basics/)
