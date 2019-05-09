@@ -25,6 +25,25 @@ func TestExecuteCommand(t *testing.T) {
 	}
 }
 
+func TestNewExecutor(t *testing.T) {
+	config, err := LoadConfig("fixtures/config_valid.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	log := logrus.New()
+	config.Actions[0].Expr = "{{ ."
+	_, err = NewExecutor(log, config)
+	if err == nil {
+		t.Error("Must be an error")
+	}
+	config.Actions[0].Expr = "up"
+	config.PrometheusURL = "@#$%^&*()"
+	_, err = NewExecutor(log, config)
+	if err == nil {
+		t.Error("Must be an error")
+	}
+}
+
 func TestRun(t *testing.T) {
 	config, err := LoadConfig("fixtures/config_valid.yaml")
 	if err != nil {
@@ -44,5 +63,9 @@ func TestRun(t *testing.T) {
 	case err := <-ch:
 		t.Fatal(err)
 	case <-time.NewTicker(time.Second).C:
+		err := executor.serveRequests()
+		if err == nil {
+			t.Error("Must be an error")
+		}
 	}
 }

@@ -173,12 +173,16 @@ func (e *Executor) processActions() {
 }
 
 func (e *Executor) serveRequests() error {
-	http.Handle("/metrics", prometheus.Handler())
 	return http.ListenAndServe(e.c.ListenAddress, nil)
+}
+
+func (e *Executor) registerHandlers() {
+	http.Handle("/metrics", prometheus.Handler())
 }
 
 func (e *Executor) Run() error {
 	errCh := make(chan error)
+	e.registerHandlers()
 	go func() {
 		errCh <- e.serveRequests()
 	}()
