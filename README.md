@@ -22,3 +22,12 @@ actions:
       - -c
       - "FORCE_IMAGE_REMOVAL=1 GRACE_PERIOD_SECONDS=3600 /usr/sbin/docker-gc"
 ```
+
+## Expression variables
+
+* `OSName` (ex: ubuntu, linuxmint);
+* `OSFamily` (ex: debian, rhel);
+* `OSVersion` – Version of the complete OS;
+* `KernelName` (ex: darwin, freebsd, linux);
+* `KernelVersion` – Version of the OS kernel (if available);
+* `Hostname`.
