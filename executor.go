@@ -18,6 +18,11 @@ import (
 	"github.com/prometheus/common/model"
 )
 
+const (
+	// Simple protection to prevent Prometheus DDoS
+	defaultRepeatDelay = time.Second
+)
+
 type Executor struct {
 	c       *Config
 	f       *Fingerprint
@@ -119,46 +124,51 @@ func (e *Executor) ExecuteCommand(command []string) error {
 	return nil
 }
 
+func (e *Executor) processAction(action *Action) {
+	logEntry := e.log.WithField("action", action.String())
+	if limited := action.IsCooldownLimited(e.c.CooldownPeriod); limited {
+		logEntry.Infof("Can't process due cooldown period")
+		return
+	}
+
+	logEntry.Debugf("Querying '%s'...", action.compiledExpr)
+	t0 := time.Now()
+	result, err := e.ExecuteQuery(action.compiledExpr)
+	promRequestDuration.WithLabelValues(action.Name).Observe(time.Since(t0).Seconds())
+	if err != nil {
+		promRequestErrorsCount.WithLabelValues(action.Name).Inc()
+		logEntry.Errorf("Failed to query: %v", err)
+		return
+	}
+
+	canExecute, err := e.CanExecuteCommand(result)
+	if err != nil {
+		logEntry.Errorf("Failed to check query result: %v", err)
+		return
+	}
+	if !canExecute {
+		return
+	}
+
+	logEntry.Debugf("Executing '%s'...", strings.Join(action.Command, " "))
+	action.lastExecTime = time.Now()
+
+	t1 := time.Now()
+	err = e.ExecuteCommand(action.Command)
+	cmdExecuteDuration.WithLabelValues(action.Name).Observe(time.Since(t1).Seconds())
+	if err != nil {
+		cmdExecuteErrorsCount.WithLabelValues(action.Name).Inc()
+		logEntry.Errorf("Failed to execute: %v", err)
+		return
+	}
+
+	logEntry.Debug("Done")
+}
+
 func (e *Executor) processActions() {
 	for _, action := range e.c.Actions {
-		logEntry := e.log.WithField("action", action.String())
-		if limited := action.IsCooldownLimited(e.c.CooldownPeriod); limited {
-			logEntry.Infof("Can't process due cooldown period")
-			continue
-		}
-
-		logEntry.Debugf("Querying '%s'...", action.compiledExpr)
-		t0 := time.Now()
-		result, err := e.ExecuteQuery(action.compiledExpr)
-		promRequestDuration.WithLabelValues(action.Name).Observe(time.Since(t0).Seconds())
-		if err != nil {
-			promRequestErrorsCount.WithLabelValues(action.Name).Inc()
-			logEntry.Errorf("Failed to query: %v", err)
-			continue
-		}
-
-		canExecute, err := e.CanExecuteCommand(result)
-		if err != nil {
-			logEntry.Errorf("Failed to check query result: %v", err)
-			continue
-		}
-		if !canExecute {
-			continue
-		}
-
-		logEntry.Debugf("Executing '%s'...", strings.Join(action.Command, " "))
-		action.lastExecTime = time.Now()
-
-		t1 := time.Now()
-		err = e.ExecuteCommand(action.Command)
-		cmdExecuteDuration.WithLabelValues(action.Name).Observe(time.Since(t1).Seconds())
-		if err != nil {
-			cmdExecuteErrorsCount.WithLabelValues(action.Name).Inc()
-			logEntry.Errorf("Failed to execute: %v", err)
-			continue
-		}
-
-		logEntry.Debug("Done")
+		e.processAction(action)
+		time.Sleep(defaultRepeatDelay)
 	}
 }
 
