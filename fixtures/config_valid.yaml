@@ -3,7 +3,7 @@
 actionsInterval: 10s
 cooldownPeriod: 5s
 commandTimeout: 5m
-prometheusURL: http://prometheus.tcsbank.ru/
+prometheusURL: http://127.0.0.1:9001
 listenAddress: 0.0.0.0:9333
 actions:
   - name: Task1

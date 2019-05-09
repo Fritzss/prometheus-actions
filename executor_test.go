@@ -1,11 +1,38 @@
 package main
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
+
+const (
+	errorResult = `{`
+	emptyResult = `{"status":"success","data":{"resultType":"vector","result":[]}}`
+	fullResult  = `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","instance":"127.0.0.1:9100","job":"test"},"value":[1557382679.814,"1"]}]}}`
+)
+
+type promMock struct {
+	result string
+}
+
+func (p *promMock) start() error {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(p.result))
+	})
+	ch := make(chan error)
+	go func() {
+		ch <- http.ListenAndServe("127.0.0.1:9001", nil)
+	}()
+	select {
+	case err := <-ch:
+		return err
+	case <-time.NewTicker(time.Second).C:
+	}
+	return nil
+}
 
 func TestExecuteCommand(t *testing.T) {
 	e := &Executor{
@@ -45,16 +72,24 @@ func TestNewExecutor(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
+	log := logrus.New()
+	defaultRepeatDelay = time.Millisecond
 	config, err := LoadConfig("fixtures/config_valid.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
-	log := logrus.New()
+
+	mock := &promMock{}
+	mock.result = fullResult
+	err = mock.start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	executor, err := NewExecutor(log, config)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defaultRepeatDelay = time.Millisecond
 	ch := make(chan error)
 	go func() {
 		ch <- executor.Run()
@@ -68,4 +103,7 @@ func TestRun(t *testing.T) {
 			t.Error("Must be an error")
 		}
 	}
+	executor.processActions()
+	executor.c.CooldownPeriod = 5 * time.Minute
+	executor.processActions()
 }
