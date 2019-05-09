@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	errorResult = `{`
-	emptyResult = `{"status":"success","data":{"resultType":"vector","result":[]}}`
-	fullResult  = `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","instance":"127.0.0.1:9100","job":"test"},"value":[1557382679.814,"1"]}]}}`
+	errorResult  = `{`
+	matrixResult = `{"status":"success","data":{"resultType":"matrix","result":[]}}`
+	emptyResult  = `{"status":"success","data":{"resultType":"vector","result":[]}}`
+	fullResult   = `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","instance":"127.0.0.1:9100","job":"test"},"value":[1557382679.814,"1"]}]}}`
 )
 
 var (
@@ -81,12 +82,14 @@ func TestRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	testRun(t, "127.0.0.1:9330", fullResult)
-	testRun(t, "127.0.0.1:9331", errorResult)
-	testRun(t, "127.0.0.1:9332", emptyResult)
+
+	testRun(t, fullResult)
+	testRun(t, emptyResult)
+	testRun(t, errorResult)
+	testRun(t, matrixResult)
 }
 
-func testRun(t *testing.T, address, result string) {
+func testRun(t *testing.T, result string) {
 	mock.result = result
 	log := logrus.New()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -96,7 +99,6 @@ func testRun(t *testing.T, address, result string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	config.ListenAddress = address
 
 	executor, err := NewExecutor(log, config)
 	if err != nil {

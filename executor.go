@@ -11,10 +11,9 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/prometheus/client_golang/api"
 	"github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 )
 
@@ -24,21 +23,27 @@ var (
 )
 
 type Executor struct {
-	mux     *http.ServeMux
-	c       *Config
-	f       *Fingerprint
-	log     *logrus.Logger
-	environ []string
-	promQL  v1.API
+	mux        *http.ServeMux
+	httpServer http.Server
+	c          *Config
+	f          *Fingerprint
+	log        *logrus.Logger
+	environ    []string
+	promQL     v1.API
 }
 
 func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
 	mux := http.NewServeMux()
+	server := http.Server{
+		Addr:    config.ListenAddress,
+		Handler: mux,
+	}
 	e := &Executor{
-		mux:     mux,
-		c:       config,
-		log:     log,
-		environ: os.Environ(),
+		mux:        mux,
+		httpServer: server,
+		c:          config,
+		log:        log,
+		environ:    os.Environ(),
 	}
 	if err := e.setupFingerprint(); err != nil {
 		return nil, err
@@ -176,7 +181,7 @@ func (e *Executor) processActions() {
 }
 
 func (e *Executor) serveRequests() error {
-	return http.ListenAndServe(e.c.ListenAddress, e.mux)
+	return e.httpServer.ListenAndServe()
 }
 
 func (e *Executor) registerHandlers() {
@@ -193,6 +198,7 @@ func (e *Executor) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
+			e.httpServer.Shutdown(ctx)
 			return nil
 		case err := <-errCh:
 			return err
