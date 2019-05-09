@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -12,6 +13,10 @@ const (
 	errorResult = `{`
 	emptyResult = `{"status":"success","data":{"resultType":"vector","result":[]}}`
 	fullResult  = `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","instance":"127.0.0.1:9100","job":"test"},"value":[1557382679.814,"1"]}]}}`
+)
+
+var (
+	mock = &promMock{}
 )
 
 type promMock struct {
@@ -72,38 +77,51 @@ func TestNewExecutor(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
+	err := mock.start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	testRun(t, "127.0.0.1:9330", fullResult)
+	testRun(t, "127.0.0.1:9331", errorResult)
+	testRun(t, "127.0.0.1:9332", emptyResult)
+}
+
+func testRun(t *testing.T, address, result string) {
+	mock.result = result
 	log := logrus.New()
+	ctx, cancel := context.WithCancel(context.Background())
+
 	defaultRepeatDelay = time.Millisecond
 	config, err := LoadConfig("fixtures/config_valid.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	mock := &promMock{}
-	mock.result = fullResult
-	err = mock.start()
-	if err != nil {
-		t.Fatal(err)
-	}
+	config.ListenAddress = address
 
 	executor, err := NewExecutor(log, config)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	ch := make(chan error)
 	go func() {
-		ch <- executor.Run()
+		ch <- executor.Run(ctx)
 	}()
+
 	select {
 	case err := <-ch:
-		t.Fatal(err)
+		if err != nil {
+			t.Fatal(err)
+		}
 	case <-time.NewTicker(time.Second).C:
 		err := executor.serveRequests()
 		if err == nil {
 			t.Error("Must be an error")
 		}
 	}
+
 	executor.processActions()
 	executor.c.CooldownPeriod = 5 * time.Minute
 	executor.processActions()
+	cancel()
 }

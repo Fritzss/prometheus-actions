@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -46,7 +47,7 @@ func realMain() int {
 		log.Error(err)
 		return 1
 	}
-	if err := executor.Run(); err != nil {
+	if err := executor.Run(context.Background()); err != nil {
 		log.Error(err)
 		return 1
 	}

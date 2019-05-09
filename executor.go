@@ -24,6 +24,7 @@ var (
 )
 
 type Executor struct {
+	mux     *http.ServeMux
 	c       *Config
 	f       *Fingerprint
 	log     *logrus.Logger
@@ -32,7 +33,9 @@ type Executor struct {
 }
 
 func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
+	mux := http.NewServeMux()
 	e := &Executor{
+		mux:     mux,
 		c:       config,
 		log:     log,
 		environ: os.Environ(),
@@ -173,14 +176,14 @@ func (e *Executor) processActions() {
 }
 
 func (e *Executor) serveRequests() error {
-	return http.ListenAndServe(e.c.ListenAddress, nil)
+	return http.ListenAndServe(e.c.ListenAddress, e.mux)
 }
 
 func (e *Executor) registerHandlers() {
-	http.Handle("/metrics", prometheus.Handler())
+	e.mux.Handle("/metrics", prometheus.Handler())
 }
 
-func (e *Executor) Run() error {
+func (e *Executor) Run(ctx context.Context) error {
 	errCh := make(chan error)
 	e.registerHandlers()
 	go func() {
@@ -189,6 +192,8 @@ func (e *Executor) Run() error {
 	next := time.After(time.Second)
 	for {
 		select {
+		case <-ctx.Done():
+			return nil
 		case err := <-errCh:
 			return err
 		case <-next:
