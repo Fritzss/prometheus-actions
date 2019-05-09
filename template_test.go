@@ -11,8 +11,8 @@ func TestTemplateFuncMap(t *testing.T) {
 		},
 	}
 	tests := map[string]string{
-		`{{ replace "abc" "abcdef" }}`:    "def",
-		`{{ default "abc" "" }}`:          "abc",
+		`{{ "abcdef" | replace "abc" }}`:  "def",
+		`{{ "" | default "abc" }}`:        "abc",
 		`{{ default "abc" 0 }}`:           "0",
 		`{{ length "abc" }}`:              "3",
 		`{{ length .arr }}`:               "3",
