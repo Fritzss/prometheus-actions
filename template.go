@@ -29,8 +29,6 @@ var TemplateFuncMap = template.FuncMap{
 			if !v.Bool() {
 				return arg
 			}
-		default:
-			return value
 		}
 
 		return value
