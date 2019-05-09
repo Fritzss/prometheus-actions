@@ -10,13 +10,21 @@ func TestLoadConfig(t *testing.T) {
 	if err == nil {
 		t.Error("Must be an error, but got a nil")
 	}
-	_, err = LoadConfig("test_data/config_invalid.yaml")
+	_, err = LoadConfig("fixtures/config_invalid.yaml")
 	if err == nil {
 		t.Error("Must be an error, but got a nil")
 	}
-	_, err = LoadConfig("test_data/config_valid.yaml")
+	_, err = LoadConfig("fixtures/config_valid.yaml")
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestSpecifyDefaults(t *testing.T) {
+	cfg := &Config{}
+	cfg.SpecifyDefaults()
+	if cfg.ListenAddress != defaultListenAddress {
+		t.Errorf("Must be %s, but got %s", defaultListenAddress, cfg.ListenAddress)
 	}
 }
 

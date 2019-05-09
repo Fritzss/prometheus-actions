@@ -24,3 +24,25 @@ func TestExecuteCommand(t *testing.T) {
 		t.Error("Must be an error")
 	}
 }
+
+func TestRun(t *testing.T) {
+	config, err := LoadConfig("fixtures/config_valid.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	log := logrus.New()
+	executor, err := NewExecutor(log, config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defaultRepeatDelay = time.Millisecond
+	ch := make(chan error)
+	go func() {
+		ch <- executor.Run()
+	}()
+	select {
+	case err := <-ch:
+		t.Fatal(err)
+	case <-time.NewTicker(time.Second).C:
+	}
+}

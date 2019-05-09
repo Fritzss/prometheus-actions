@@ -18,7 +18,7 @@ import (
 	"github.com/prometheus/common/model"
 )
 
-const (
+var (
 	// Simple protection to prevent Prometheus DDoS
 	defaultRepeatDelay = time.Second
 )

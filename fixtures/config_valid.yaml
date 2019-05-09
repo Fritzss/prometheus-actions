@@ -1,0 +1,16 @@
+---
+# Fix fixture used for executor tests
+actionsInterval: 10s
+cooldownPeriod: 5s
+commandTimeout: 5m
+prometheusURL: http://prometheus.tcsbank.ru/
+listenAddress: 0.0.0.0:9333
+actions:
+  - name: Task1
+    expr: up
+    command:
+      - whoami
+  - name: Task2
+    expr: up
+    command:
+      - foobar

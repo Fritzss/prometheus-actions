@@ -32,11 +32,11 @@ func LoadConfig(filename string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	config.specifyDefaults()
+	config.SpecifyDefaults()
 	return config, nil
 }
 
-func (c *Config) specifyDefaults() {
+func (c *Config) SpecifyDefaults() {
 	if len(c.ListenAddress) == 0 {
 		c.ListenAddress = defaultListenAddress
 	}
