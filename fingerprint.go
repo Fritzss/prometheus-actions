@@ -14,6 +14,7 @@ type Fingerprint struct {
 }
 
 func BuildFingerprint() (*Fingerprint, error) {
+	// host.Info can returns an error on windows hosts
 	hostInfo, err := host.Info()
 	if err != nil {
 		return nil, err
