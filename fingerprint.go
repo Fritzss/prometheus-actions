@@ -1,8 +1,6 @@
 package main
 
 import (
-	"runtime"
-
 	"github.com/shirou/gopsutil/host"
 )
 
@@ -24,7 +22,7 @@ func BuildFingerprint() (*Fingerprint, error) {
 		OSName:        hostInfo.Platform,
 		OSFamily:      hostInfo.PlatformFamily,
 		OSVersion:     hostInfo.PlatformVersion,
-		KernelName:    runtime.GOOS,
+		KernelName:    hostInfo.OS,
 		KernelVersion: hostInfo.KernelVersion,
 		Hostname:      hostInfo.Hostname,
 	}
