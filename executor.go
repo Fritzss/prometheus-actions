@@ -70,11 +70,8 @@ func (e *Executor) compileQueries() error {
 
 func (e *Executor) setupFingerprint() error {
 	fingerprint, err := BuildFingerprint()
-	if err != nil {
-		return err
-	}
 	e.f = fingerprint
-	return nil
+	return err
 }
 
 func (e *Executor) setupPromQL() error {
