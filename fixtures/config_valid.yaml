@@ -1,6 +1,6 @@
 ---
 # Fix fixture used for executor tests
-actionsInterval: 10s
+repeatInterval: 10s
 cooldownPeriod: 5s
 commandTimeout: 5m
 prometheusURL: http://127.0.0.1:9001

@@ -132,7 +132,7 @@ func (e *Executor) ExecuteCommand(command []string) error {
 func (e *Executor) processAction(action *Action) {
 	logEntry := e.log.WithField("action", action.String())
 	if limited := action.IsCooldownLimited(e.c.CooldownPeriod); limited {
-		logEntry.Infof("Can't process due cooldown period")
+		logEntry.Debug("Can't process due cooldown period")
 		return
 	}
 
@@ -155,7 +155,7 @@ func (e *Executor) processAction(action *Action) {
 		return
 	}
 
-	logEntry.Debugf("Executing '%s'...", strings.Join(action.Command, " "))
+	logEntry.Infof("Executing '%s'...", strings.Join(action.Command, " "))
 	action.lastExecTime = time.Now()
 
 	t1 := time.Now()
@@ -201,8 +201,8 @@ func (e *Executor) Run(ctx context.Context) error {
 			return err
 		case <-next:
 			e.processActions()
-			next = time.After(e.c.ActionsInterval)
-			e.log.Debugf("Sleeping for a %s...", e.c.ActionsInterval)
+			next = time.After(e.c.RepeatInterval)
+			e.log.Debugf("Sleeping for a %s...", e.c.RepeatInterval)
 		}
 	}
 }
