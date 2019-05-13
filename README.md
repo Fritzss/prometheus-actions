@@ -34,7 +34,7 @@ actions:
 * `OSName` – One of ubuntu, linuxmint, and so on;
 * `OSFamily` – One of debian, rhel, and so on;
 * `OSVersion` – Version of the complete OS;
-* `KernelName` – One of darwin, freebsd, linux, and so on;
+* `KernelName` – One of darwin, linux, and so on;
 * `KernelVersion` – Version of the OS kernel (if available);
 * `Hostname`.
 
