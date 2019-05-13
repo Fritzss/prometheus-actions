@@ -1,6 +1,9 @@
 package main
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/version"
+)
 
 var (
 	cmdExecuteDuration = prometheus.NewSummaryVec(
@@ -31,6 +34,13 @@ var (
 		},
 		[]string{"action"},
 	)
+	buildInfo = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "prometheus_actions_build_info",
+			Help: "A metric with a constant '1' value labeled by version, revision, branch, and goversion from which Prometheus Actions was built.",
+		},
+		[]string{"version", "revision", "branch", "goversion"},
+	)
 )
 
 func init() {
@@ -38,4 +48,12 @@ func init() {
 	prometheus.MustRegister(cmdExecuteErrorsCount)
 	prometheus.MustRegister(promRequestErrorsCount)
 	prometheus.MustRegister(promRequestDuration)
+	prometheus.MustRegister(buildInfo)
+
+	buildInfo.WithLabelValues(
+		version.Version,
+		version.Revision,
+		version.Branch,
+		version.GoVersion,
+	).Set(1)
 }
