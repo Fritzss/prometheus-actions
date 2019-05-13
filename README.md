@@ -46,6 +46,7 @@ See [template_test.go](template_test.go) for examples.
 
 ## Metrics
 
+* `prometheus_actions_build_info`
 * `prometheus_actions_command_execute_duration_seconds`
 * `prometheus_actions_command_execute_errors_total`
 * `prometheus_actions_prometheus_request_duration_seconds`
