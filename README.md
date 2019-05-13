@@ -1,10 +1,7 @@
 # Prometheus Actions
 
-[![BuildStatus Widget]][BuildStatus Result]
+[![Build Status](https://travis-ci.com/leominov/prometheus-actions.svg?token=tyxzVzn67Z9UV2wuxhSV&branch=master)](https://travis-ci.com/leominov/prometheus-actions)
 [![codecov](https://codecov.io/gh/leominov/prometheus-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/leominov/prometheus-actions)
-
-[BuildStatus Result]: https://travis-ci.com/leominov/prometheus-actions
-[BuildStatus Widget]: https://travis-ci.com/leominov/prometheus-actions.svg?branch=master
 
 ## Configuration example
 
