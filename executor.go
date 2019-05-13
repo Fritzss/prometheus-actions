@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -25,11 +26,13 @@ var (
 type Executor struct {
 	mux        *http.ServeMux
 	httpServer http.Server
-	c          *Config
 	f          *Fingerprint
 	log        *logrus.Logger
 	environ    []string
 	promQL     v1.API
+
+	sync.Mutex
+	c *Config
 }
 
 func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
@@ -171,6 +174,8 @@ func (e *Executor) processAction(action *Action) {
 }
 
 func (e *Executor) processActions() {
+	e.Lock()
+	defer e.Unlock()
 	for _, action := range e.c.Actions {
 		e.processAction(action)
 		time.Sleep(defaultRepeatDelay)
