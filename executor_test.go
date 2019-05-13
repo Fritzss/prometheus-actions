@@ -83,13 +83,13 @@ func TestRun(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testRun(t, fullResult)
-	testRun(t, emptyResult)
-	testRun(t, errorResult)
-	testRun(t, matrixResult)
+	testRun(t, ":9301", fullResult)
+	testRun(t, ":9302", emptyResult)
+	testRun(t, ":9303", errorResult)
+	testRun(t, ":9304", matrixResult)
 }
 
-func testRun(t *testing.T, result string) {
+func testRun(t *testing.T, listenAddress, result string) {
 	mock.result = result
 	log := logrus.New()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -99,6 +99,7 @@ func testRun(t *testing.T, result string) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	config.ListenAddress = listenAddress
 
 	executor, err := NewExecutor(log, config)
 	if err != nil {
