@@ -24,6 +24,13 @@ actions:
       - bash
       - -c
       - "FORCE_IMAGE_REMOVAL=1 GRACE_PERIOD_SECONDS=3600 /usr/sbin/docker-gc"
+  - name: GitLab Runner Self-healing
+    expr: |
+      ALERTS{instance="{{ .Hostname }}", alertname="GitlabRunnerDown"} == 1
+    command:
+      - systemctl
+      - restart
+      - gitlab-runner
 ```
 
 ## Template variables
