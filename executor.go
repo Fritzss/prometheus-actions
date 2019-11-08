@@ -13,7 +13,7 @@ import (
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/model"
 )
 
@@ -182,7 +182,7 @@ func (e *Executor) serveRequests() error {
 }
 
 func (e *Executor) registerHandlers() {
-	e.mux.Handle("/metrics", prometheus.Handler())
+	e.mux.Handle("/metrics", promhttp.Handler())
 }
 
 func (e *Executor) Run(ctx context.Context) error {
@@ -195,8 +195,7 @@ func (e *Executor) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
-			e.httpServer.Shutdown(ctx)
-			return nil
+			return e.httpServer.Shutdown(ctx)
 		case err := <-errCh:
 			return err
 		case <-next:

@@ -26,7 +26,10 @@ type promMock struct {
 
 func (p *promMock) start() error {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(p.result))
+		_, err := w.Write([]byte(p.result))
+		if err != nil {
+			http.Error(w, "Error", http.StatusInternalServerError)
+		}
 	})
 	ch := make(chan error)
 	go func() {
