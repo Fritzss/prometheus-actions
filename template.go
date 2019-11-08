@@ -81,7 +81,7 @@ func recovery() {
 	recover()
 }
 
-func generateTemplate(templ, name string, data interface{}) (string, error) {
+func GenerateTemplate(templ, name string, data interface{}) (string, error) {
 	var templateEng *template.Template
 	buf := bytes.NewBufferString("")
 	templateEng = template.New(name)

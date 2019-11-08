@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/prometheus/client_golang/api"
-	"github.com/prometheus/client_golang/api/prometheus/v1"
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 )
@@ -59,7 +59,7 @@ func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
 
 func (e *Executor) compileQueries() error {
 	for _, action := range e.c.Actions {
-		ql, err := generateTemplate(action.Expr, action.String(), e.f)
+		ql, err := GenerateTemplate(action.Expr, action.String(), e.f)
 		if err != nil {
 			return err
 		}

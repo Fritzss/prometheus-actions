@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func TestTemplateFuncMap(t *testing.T) {
+func TestGenerateTemplate(t *testing.T) {
 	data := map[string]interface{}{
 		"arr": []string{
 			"1",
@@ -25,12 +25,16 @@ func TestTemplateFuncMap(t *testing.T) {
 		`{{ yesno "yes" "no" false }}`:    "no",
 	}
 	for in, out := range tests {
-		result, err := generateTemplate(in, "test", data)
+		result, err := GenerateTemplate(in, "test", data)
 		if err != nil {
 			t.Error(err)
 		}
 		if result != out {
 			t.Errorf("Must be %s, but got %s", out, result)
 		}
+	}
+	_, err := GenerateTemplate("{{nil}}", "test", nil)
+	if err == nil {
+		t.Error("Must be an error, but got nil")
 	}
 }
