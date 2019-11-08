@@ -53,13 +53,14 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:b8fc32232f276bebfed92b136bce3c9efc600afbf8abb76aa6406a75ab24d9e5"
+  digest = "1:4594833620d039a1c1e889d445988edfc2cdcc95b7e5f40fd63a9d17e2f2ed3f"
   name = "github.com/prometheus/client_golang"
   packages = [
     "api",
     "api/prometheus/v1",
     "prometheus",
     "prometheus/internal",
+    "prometheus/promhttp",
   ]
   pruneopts = "UT"
   revision = "505eaef017263e299324067d40ca2c48f6a2cf50"
@@ -154,6 +155,7 @@
     "github.com/prometheus/client_golang/api",
     "github.com/prometheus/client_golang/api/prometheus/v1",
     "github.com/prometheus/client_golang/prometheus",
+    "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/prometheus/common/model",
     "github.com/prometheus/common/version",
     "github.com/shirou/gopsutil/host",
