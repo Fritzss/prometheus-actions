@@ -13,6 +13,8 @@ func TestGenerateTemplate(t *testing.T) {
 	tests := map[string]string{
 		`{{ "abcdef" | replace "abc" }}`:  "def",
 		`{{ "" | default "abc" }}`:        "abc",
+		`{{ true | default "foobar" }}`:   "true",
+		`{{ "foobar" | default true }}`:   "foobar",
 		`{{ default "abc" 0 }}`:           "0",
 		`{{ length "abc" }}`:              "3",
 		`{{ length .arr }}`:               "3",
