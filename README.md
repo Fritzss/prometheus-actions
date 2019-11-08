@@ -13,6 +13,7 @@ commandTimeout: 5m
 prometheusURL: http://prometheus.local/
 listenAddress: 0.0.0.0:9333
 actions:
+  # Example 1: Doocker GC based on free space
   - name: Docker GC
     # Only Vectors supported for now
     expr: |
@@ -24,13 +25,22 @@ actions:
       - bash
       - -c
       - "FORCE_IMAGE_REMOVAL=1 GRACE_PERIOD_SECONDS=3600 /usr/sbin/docker-gc"
+  # Example 2: Restart GitLab runner before alert was fired
   - name: GitLab Runner Self-healing
     expr: |
-      ALERTS{instance="{{ .Hostname }}", alertname="GitlabRunnerDown"} == 1
+      ALERTS{instance="{{ .Hostname }}", alertname="GitlabRunnerDown", alertstate="pending"} == 1
     command:
       - systemctl
       - restart
       - gitlab-runner
+  # Example 3: Runs gitlabsos when GitLab server goes down
+  - name: Gitlab SOS
+    expr: |
+      ALERTS{instance="{{ .Hostname }}", alertname="GitLabServerDown"} == 1
+    command:
+      - gitlabsos
+      - --dir
+      - /opt/gitlabsos
 ```
 
 ## Template variables
