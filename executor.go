@@ -24,7 +24,7 @@ var (
 
 type Executor struct {
 	mux        *http.ServeMux
-	httpServer http.Server
+	httpServer *http.Server
 	c          *Config
 	f          *Fingerprint
 	log        *logrus.Logger
@@ -40,7 +40,7 @@ func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
 	}
 	e := &Executor{
 		mux:        mux,
-		httpServer: server,
+		httpServer: &server,
 		c:          config,
 		log:        log,
 		environ:    os.Environ(),
