@@ -28,14 +28,14 @@ actions:
   # Example 2: Restart GitLab runner before alert was fired
   - name: GitLab Runner Self-healing
     expr: |
-      ALERTS{instance="{{ .Hostname }}", alertname="GitlabRunnerDown", alertstate="pending"} == 1
+      ALERTS{instance="{{ .Hostname }}", alertname="GitLabRunnerDown", alertstate="pending"} == 1
     command:
       - systemctl
       - restart
       - gitlab-runner
   # Example 3: Runs gitlabsos when GitLab server goes down
   # ref: https://gitlab.com/gitlab-com/support/toolbox/gitlabsos
-  - name: Gitlab SOS
+  - name: GitLab SOS
     expr: |
       ALERTS{instance="{{ .Hostname }}", alertname="GitLabServerDown"} == 1
     command:
