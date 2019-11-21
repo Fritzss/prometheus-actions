@@ -63,8 +63,12 @@ See [template_test.go](template_test.go) for examples.
 
 * `prometheus_actions_build_info`
 * `prometheus_actions_command_execute_duration_seconds`
+* `prometheus_actions_command_execute_duration_seconds_count`
+* `prometheus_actions_command_execute_duration_seconds_sum`
 * `prometheus_actions_command_execute_errors_total`
 * `prometheus_actions_prometheus_request_duration_seconds`
+* `prometheus_actions_prometheus_request_duration_seconds_count`
+* `prometheus_actions_prometheus_request_duration_seconds_sum`
 * `prometheus_actions_prometheus_request_errors_total`
 
 ## Links
