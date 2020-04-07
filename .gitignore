@@ -17,3 +17,7 @@
 coverage.txt
 /.build
 /.tarballs
+
+# IDE
+.idea
+.vscode
