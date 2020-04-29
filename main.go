@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/prometheus/common/version"
-
 	"github.com/sirupsen/logrus"
 )
 
