@@ -1,6 +1,9 @@
 ---
 language: go
 
+go:
+  - "1.14"
+
 script:
   # TODO(l.aminov): Add race condition detection
   # - go test -race -coverprofile=coverage.txt -covermode=atomic
