@@ -103,12 +103,12 @@ func (e *Executor) CanExecuteCommand(result model.Value) (bool, error) {
 		}
 		return false, nil
 	}
-	return false, fmt.Errorf("Unexpected result type: %v", result.Type())
+	return false, fmt.Errorf("unexpected result type: %v", result.Type())
 }
 
 func (e *Executor) ExecuteCommand(command []string) error {
 	var cmd *exec.Cmd
-	ctx, cancel := context.WithTimeout(context.Background(), e.c.СommandTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), e.c.CommandTimeout)
 	defer cancel()
 	if len(command) == 1 {
 		cmd = exec.CommandContext(ctx, command[0])
@@ -123,7 +123,7 @@ func (e *Executor) ExecuteCommand(command []string) error {
 		return ctx.Err()
 	}
 	if err != nil {
-		return fmt.Errorf("Non-zero exit code: %v", err)
+		return fmt.Errorf("non-zero exit code: %v", err)
 	}
 	return nil
 }

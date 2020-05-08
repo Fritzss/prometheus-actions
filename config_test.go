@@ -57,7 +57,7 @@ func TestValidate_Config(t *testing.T) {
 	c = &Config{
 		Actions:        actions,
 		RepeatInterval: time.Minute,
-		СommandTimeout: time.Minute,
+		CommandTimeout: time.Minute,
 	}
 	if err := c.Validate(); err == nil {
 		t.Error("Must be an error, but got nil")

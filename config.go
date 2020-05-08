@@ -17,7 +17,7 @@ type Config struct {
 	ListenAddress  string        `yaml:"listenAddress"`
 	PrometheusURL  string        `yaml:"prometheusURL"`
 	RepeatInterval time.Duration `yaml:"repeatInterval"`
-	СommandTimeout time.Duration `yaml:"commandTimeout"`
+	CommandTimeout time.Duration `yaml:"commandTimeout"`
 	CooldownPeriod time.Duration `yaml:"cooldownPeriod"`
 	Actions        []*Action
 }
@@ -44,22 +44,22 @@ func (c *Config) SpecifyDefaults() {
 
 func (c *Config) Validate() error {
 	if len(c.Actions) == 0 {
-		return errors.New("Actions must be specified")
+		return errors.New("actions must be specified")
 	}
 	if c.RepeatInterval <= time.Second {
-		return fmt.Errorf("RepeatInterval must be greater than second")
+		return errors.New("repeatInterval must be greater than second")
 	}
-	if c.СommandTimeout <= time.Second {
-		return fmt.Errorf("СommandTimeout must be greater than second")
+	if c.CommandTimeout <= time.Second {
+		return errors.New("commandTimeout must be greater than second")
 	}
 	uniqueActions := make(map[string]bool)
 	for i, action := range c.Actions {
 		err := action.Validate()
 		if err != nil {
-			return fmt.Errorf("Action %d error: %v", i, err)
+			return fmt.Errorf("action %d error: %v", i, err)
 		}
 		if _, ok := uniqueActions[action.Name]; ok {
-			return fmt.Errorf("Duplicate of %s action", action.Name)
+			return fmt.Errorf("duplicate of %s action", action.Name)
 		}
 		uniqueActions[action.Name] = true
 	}

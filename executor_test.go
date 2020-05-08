@@ -47,7 +47,7 @@ func TestExecuteCommand(t *testing.T) {
 	e := &Executor{
 		log: logrus.New(),
 		c: &Config{
-			СommandTimeout: 100 * time.Millisecond,
+			CommandTimeout: 100 * time.Millisecond,
 		},
 	}
 	if err := e.ExecuteCommand([]string{"whoami"}); err != nil {
