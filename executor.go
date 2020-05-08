@@ -87,21 +87,14 @@ func (e *Executor) setupPromQL() error {
 }
 
 func (e *Executor) ExecuteQuery(q string) (model.Value, error) {
-	result, err := e.promQL.Query(context.Background(), q, time.Now())
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return e.promQL.Query(context.Background(), q, time.Now())
 }
 
 func (e *Executor) CanExecuteCommand(result model.Value) (bool, error) {
 	switch {
 	case result.Type() == model.ValVector:
 		samples := result.(model.Vector).Len()
-		if samples > 0 {
-			return true, nil
-		}
-		return false, nil
+		return samples > 0, nil
 	}
 	return false, fmt.Errorf("unexpected result type: %v", result.Type())
 }
