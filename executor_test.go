@@ -59,9 +59,7 @@ func TestExecuteCommand(t *testing.T) {
 
 func TestNewExecutor(t *testing.T) {
 	config, err := LoadConfig("fixtures/config_valid.yaml")
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 
 	log := logrus.New()
 	config.Actions[0].Expr = "{{ ."
