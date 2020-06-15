@@ -61,7 +61,7 @@ See [template_test.go](template_test.go) for examples.
 
 ## Environment variables
 
-Every expression returns slice of model.LabelSet, this labelSets passed to environment variables of executed command, for example:
+Every expression returns slice of model.LabelSet, non-empty sets will be passed to environment variables of executed command, for example:
 
 ```shell script
 LABEL_INSTANCE_0=127.0.0.1:9090
