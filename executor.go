@@ -106,7 +106,7 @@ func (e *Executor) ParseQueryResult(result model.Value) ([]model.LabelSet, bool,
 	return nil, false, fmt.Errorf("unexpected result type: %v", result.Type())
 }
 
-func (e *Executor) ExecuteCommand(command []string) error {
+func (e *Executor) ExecuteCommand(command []string, env []string) error {
 	var cmd *exec.Cmd
 	ctx, cancel := context.WithTimeout(context.Background(), e.c.CommandTimeout)
 	defer cancel()
@@ -115,7 +115,7 @@ func (e *Executor) ExecuteCommand(command []string) error {
 	} else {
 		cmd = exec.CommandContext(ctx, command[0], command[1:]...)
 	}
-	cmd.Env = e.environ
+	cmd.Env = append(e.environ, env...)
 	cmd.Stderr = e.log.WithField("src", "cmd").WriterLevel(logrus.ErrorLevel)
 	cmd.Stdout = e.log.WithField("src", "cmd").WriterLevel(logrus.DebugLevel)
 	err := cmd.Run()
@@ -147,7 +147,7 @@ func (e *Executor) processAction(action *Action) {
 		return
 	}
 
-	_, canExecute, err := e.ParseQueryResult(result)
+	labelSetSlice, canExecute, err := e.ParseQueryResult(result)
 	if err != nil {
 		logEntry.Errorf("Failed to check query result: %v", err)
 		return
@@ -160,7 +160,8 @@ func (e *Executor) processAction(action *Action) {
 	action.lastExecTime = time.Now()
 
 	t1 := time.Now()
-	err = e.ExecuteCommand(action.Command)
+	queryEnviron := LabelSetSliceEnviron(labelSetSlice)
+	err = e.ExecuteCommand(action.Command, queryEnviron)
 	cmdExecuteDuration.WithLabelValues(action.Name).Observe(time.Since(t1).Seconds())
 	if err != nil {
 		cmdExecuteErrorsCount.WithLabelValues(action.Name).Inc()

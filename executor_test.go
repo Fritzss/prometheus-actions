@@ -53,9 +53,9 @@ func TestExecuteCommand(t *testing.T) {
 			CommandTimeout: 100 * time.Millisecond,
 		},
 	}
-	assert.NoError(t, e.ExecuteCommand([]string{"whoami"}))
-	assert.Error(t, e.ExecuteCommand([]string{"sleep", "0.5"}))
-	assert.Error(t, e.ExecuteCommand([]string{"exit", "1"}))
+	assert.NoError(t, e.ExecuteCommand([]string{"whoami"}, nil))
+	assert.Error(t, e.ExecuteCommand([]string{"sleep", "0.5"}, nil))
+	assert.Error(t, e.ExecuteCommand([]string{"exit", "1"}, nil))
 }
 
 func TestNewExecutor(t *testing.T) {
