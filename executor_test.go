@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
+	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -119,4 +120,61 @@ func testRun(t *testing.T, listenAddress, result string) {
 	executor.c.CooldownPeriod = 5 * time.Minute
 	executor.processActions()
 	cancel()
+}
+
+func TestExecutor_CanExecuteCommand(t *testing.T) {
+	prometheusURL := "http://127.0.0.1:9090"
+	_, err := http.Get(fmt.Sprintf("%s/-/healthy", prometheusURL))
+	if err != nil {
+		t.Skip("Run Prometheus before tests")
+	}
+
+	config := &Config{
+		PrometheusURL: prometheusURL,
+	}
+
+	ex, err := NewExecutor(logrus.New(), config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	vals, err := ex.ExecuteQuery(`count(up) > 0`)
+	assert.NoError(t, err)
+
+	labelSetSlice, ok, err := ex.CanExecuteCommand(vals)
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, 0, len(labelSetSlice))
+
+	vals, err = ex.ExecuteQuery(`up`)
+	assert.NoError(t, err)
+
+	labelSetSlice, ok, err = ex.CanExecuteCommand(vals)
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, 1, len(labelSetSlice))
+
+	for _, labelSet := range labelSetSlice {
+		for labelKey, labelValue := range labelSet {
+			if labelKey == ("__name__") {
+				assert.Equal(t, model.LabelValue("up"), labelValue)
+			}
+		}
+	}
+
+	vals, err = ex.ExecuteQuery(`count(up) > 10`)
+	assert.NoError(t, err)
+
+	labelSetSlice, ok, err = ex.CanExecuteCommand(vals)
+	assert.NoError(t, err)
+	assert.False(t, ok)
+	assert.Equal(t, 0, len(labelSetSlice))
+
+	vals, err = ex.ExecuteQuery(`count(up2) > 0`)
+	assert.NoError(t, err)
+
+	labelSetSlice, ok, err = ex.CanExecuteCommand(vals)
+	assert.NoError(t, err)
+	assert.False(t, ok)
+	assert.Equal(t, 0, len(labelSetSlice))
 }

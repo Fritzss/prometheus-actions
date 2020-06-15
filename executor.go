@@ -90,13 +90,20 @@ func (e *Executor) ExecuteQuery(q string) (model.Value, error) {
 	return e.promQL.Query(context.Background(), q, time.Now())
 }
 
-func (e *Executor) CanExecuteCommand(result model.Value) (bool, error) {
+func (e *Executor) CanExecuteCommand(result model.Value) ([]model.LabelSet, bool, error) {
 	switch {
 	case result.Type() == model.ValVector:
+		var labelSetSlice []model.LabelSet
 		samples := result.(model.Vector).Len()
-		return samples > 0, nil
+		for _, data := range result.(model.Vector) {
+			if len(data.Metric) == 0 {
+				continue
+			}
+			labelSetSlice = append(labelSetSlice, model.LabelSet(data.Metric))
+		}
+		return labelSetSlice, samples > 0, nil
 	}
-	return false, fmt.Errorf("unexpected result type: %v", result.Type())
+	return nil, false, fmt.Errorf("unexpected result type: %v", result.Type())
 }
 
 func (e *Executor) ExecuteCommand(command []string) error {
@@ -138,7 +145,7 @@ func (e *Executor) processAction(action *Action) {
 		return
 	}
 
-	canExecute, err := e.CanExecuteCommand(result)
+	_, canExecute, err := e.CanExecuteCommand(result)
 	if err != nil {
 		logEntry.Errorf("Failed to check query result: %v", err)
 		return
