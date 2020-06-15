@@ -90,7 +90,7 @@ func (e *Executor) ExecuteQuery(q string) (model.Value, error) {
 	return e.promQL.Query(context.Background(), q, time.Now())
 }
 
-func (e *Executor) CanExecuteCommand(result model.Value) ([]model.LabelSet, bool, error) {
+func (e *Executor) ParseQueryResult(result model.Value) ([]model.LabelSet, bool, error) {
 	switch {
 	case result.Type() == model.ValVector:
 		var labelSetSlice []model.LabelSet
@@ -137,7 +137,9 @@ func (e *Executor) processAction(action *Action) {
 
 	logEntry.Debugf("Querying '%s'...", action.compiledExpr)
 	t0 := time.Now()
+
 	result, err := e.ExecuteQuery(action.compiledExpr)
+
 	promRequestDuration.WithLabelValues(action.Name).Observe(time.Since(t0).Seconds())
 	if err != nil {
 		promRequestErrorsCount.WithLabelValues(action.Name).Inc()
@@ -145,7 +147,7 @@ func (e *Executor) processAction(action *Action) {
 		return
 	}
 
-	_, canExecute, err := e.CanExecuteCommand(result)
+	_, canExecute, err := e.ParseQueryResult(result)
 	if err != nil {
 		logEntry.Errorf("Failed to check query result: %v", err)
 		return

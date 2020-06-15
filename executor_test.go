@@ -122,7 +122,7 @@ func testRun(t *testing.T, listenAddress, result string) {
 	cancel()
 }
 
-func TestExecutor_CanExecuteCommand(t *testing.T) {
+func TestExecutor_ParseQueryResult(t *testing.T) {
 	prometheusURL := "http://127.0.0.1:9090"
 	_, err := http.Get(fmt.Sprintf("%s/-/healthy", prometheusURL))
 	if err != nil {
@@ -141,7 +141,7 @@ func TestExecutor_CanExecuteCommand(t *testing.T) {
 	vals, err := ex.ExecuteQuery(`count(up) > 0`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err := ex.CanExecuteCommand(vals)
+	labelSetSlice, ok, err := ex.ParseQueryResult(vals)
 	assert.NoError(t, err)
 	assert.True(t, ok)
 	assert.Equal(t, 0, len(labelSetSlice))
@@ -149,7 +149,7 @@ func TestExecutor_CanExecuteCommand(t *testing.T) {
 	vals, err = ex.ExecuteQuery(`up`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err = ex.CanExecuteCommand(vals)
+	labelSetSlice, ok, err = ex.ParseQueryResult(vals)
 	assert.NoError(t, err)
 	assert.True(t, ok)
 	assert.Equal(t, 1, len(labelSetSlice))
@@ -165,7 +165,7 @@ func TestExecutor_CanExecuteCommand(t *testing.T) {
 	vals, err = ex.ExecuteQuery(`count(up) > 10`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err = ex.CanExecuteCommand(vals)
+	labelSetSlice, ok, err = ex.ParseQueryResult(vals)
 	assert.NoError(t, err)
 	assert.False(t, ok)
 	assert.Equal(t, 0, len(labelSetSlice))
@@ -173,7 +173,7 @@ func TestExecutor_CanExecuteCommand(t *testing.T) {
 	vals, err = ex.ExecuteQuery(`count(up2) > 0`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err = ex.CanExecuteCommand(vals)
+	labelSetSlice, ok, err = ex.ParseQueryResult(vals)
 	assert.NoError(t, err)
 	assert.False(t, ok)
 	assert.Equal(t, 0, len(labelSetSlice))
