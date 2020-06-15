@@ -19,7 +19,7 @@ type Config struct {
 	RepeatInterval time.Duration `yaml:"repeatInterval"`
 	CommandTimeout time.Duration `yaml:"commandTimeout"`
 	CooldownPeriod time.Duration `yaml:"cooldownPeriod"`
-	Actions        []*Action
+	Actions        []*Action     `yaml:"actions"`
 }
 
 func LoadConfig(filename string) (*Config, error) {

@@ -138,18 +138,18 @@ func TestExecutor_ParseQueryResult(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	vals, err := ex.ExecuteQuery(`count(up) > 0`)
+	result, err := ex.ExecuteQuery(`count(up) > 0`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err := ex.ParseQueryResult(vals)
+	labelSetSlice, ok, err := ex.ParseQueryResult(result)
 	assert.NoError(t, err)
 	assert.True(t, ok)
 	assert.Equal(t, 0, len(labelSetSlice))
 
-	vals, err = ex.ExecuteQuery(`up`)
+	result, err = ex.ExecuteQuery(`up`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err = ex.ParseQueryResult(vals)
+	labelSetSlice, ok, err = ex.ParseQueryResult(result)
 	assert.NoError(t, err)
 	assert.True(t, ok)
 	assert.Equal(t, 1, len(labelSetSlice))
@@ -162,18 +162,18 @@ func TestExecutor_ParseQueryResult(t *testing.T) {
 		}
 	}
 
-	vals, err = ex.ExecuteQuery(`count(up) > 10`)
+	result, err = ex.ExecuteQuery(`count(up) > 10`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err = ex.ParseQueryResult(vals)
+	labelSetSlice, ok, err = ex.ParseQueryResult(result)
 	assert.NoError(t, err)
 	assert.False(t, ok)
 	assert.Equal(t, 0, len(labelSetSlice))
 
-	vals, err = ex.ExecuteQuery(`count(up2) > 0`)
+	result, err = ex.ExecuteQuery(`count(up2) > 0`)
 	assert.NoError(t, err)
 
-	labelSetSlice, ok, err = ex.ParseQueryResult(vals)
+	labelSetSlice, ok, err = ex.ParseQueryResult(result)
 	assert.NoError(t, err)
 	assert.False(t, ok)
 	assert.Equal(t, 0, len(labelSetSlice))

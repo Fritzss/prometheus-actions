@@ -6,9 +6,9 @@ import (
 )
 
 type Action struct {
-	Name         string
-	Command      []string
-	Expr         string
+	Name         string   `yaml:"name"`
+	Command      []string `yaml:"command"`
+	Expr         string   `yaml:"expr"`
 	compiledExpr string
 	lastExecTime time.Time
 }
