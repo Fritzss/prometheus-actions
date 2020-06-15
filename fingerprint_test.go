@@ -1,10 +1,12 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestBuildFingerprint(t *testing.T) {
 	_, err := BuildFingerprint()
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 }

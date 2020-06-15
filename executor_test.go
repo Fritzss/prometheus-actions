@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,15 +52,9 @@ func TestExecuteCommand(t *testing.T) {
 			CommandTimeout: 100 * time.Millisecond,
 		},
 	}
-	if err := e.ExecuteCommand([]string{"whoami"}); err != nil {
-		t.Error(err)
-	}
-	if err := e.ExecuteCommand([]string{"sleep", "0.5"}); err == nil {
-		t.Error("Must be timeout")
-	}
-	if err := e.ExecuteCommand([]string{"exit", "1"}); err == nil {
-		t.Error("Must be an error")
-	}
+	assert.NoError(t, e.ExecuteCommand([]string{"whoami"}))
+	assert.Error(t, e.ExecuteCommand([]string{"sleep", "0.5"}))
+	assert.Error(t, e.ExecuteCommand([]string{"exit", "1"}))
 }
 
 func TestNewExecutor(t *testing.T) {
@@ -66,18 +62,16 @@ func TestNewExecutor(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	log := logrus.New()
 	config.Actions[0].Expr = "{{ ."
 	_, err = NewExecutor(log, config)
-	if err == nil {
-		t.Error("Must be an error")
-	}
+	assert.Error(t, err)
+
 	config.Actions[0].Expr = "up"
 	config.PrometheusURL = "@#$%^&*()"
 	_, err = NewExecutor(log, config)
-	if err == nil {
-		t.Error("Must be an error")
-	}
+	assert.Error(t, err)
 }
 
 func TestRun(t *testing.T) {
@@ -120,10 +114,7 @@ func testRun(t *testing.T, listenAddress, result string) {
 			t.Fatal(err)
 		}
 	case <-time.NewTicker(time.Second).C:
-		err := executor.serveRequests()
-		if err == nil {
-			t.Error("Must be an error")
-		}
+		assert.Error(t, executor.serveRequests())
 	}
 
 	executor.processActions()

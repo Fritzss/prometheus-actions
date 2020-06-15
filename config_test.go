@@ -3,34 +3,30 @@ package main
 import (
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLoadConfig(t *testing.T) {
 	_, err := LoadConfig("not-found")
-	if err == nil {
-		t.Error("Must be an error, but got a nil")
-	}
+	assert.Error(t, err)
+
 	_, err = LoadConfig("fixtures/config_invalid.yaml")
-	if err == nil {
-		t.Error("Must be an error, but got a nil")
-	}
+	assert.Error(t, err)
+
 	_, err = LoadConfig("fixtures/config_valid.yaml")
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestSpecifyDefaults(t *testing.T) {
 	cfg := &Config{}
 	cfg.SpecifyDefaults()
-	if cfg.ListenAddress != defaultListenAddress {
-		t.Errorf("Must be %s, but got %s", defaultListenAddress, cfg.ListenAddress)
-	}
+	assert.Equal(t, defaultListenAddress, cfg.ListenAddress)
 }
 
 func TestValidate_Config(t *testing.T) {
 	actions := []*Action{
-		&Action{
+		{
 			Name: "name",
 			Command: []string{
 				"cmd",
@@ -38,36 +34,29 @@ func TestValidate_Config(t *testing.T) {
 		},
 	}
 	c := &Config{}
-	if err := c.Validate(); err == nil {
-		t.Error("Must be an error, but got nil")
-	}
+	assert.Error(t, c.Validate())
+
 	c = &Config{
 		Actions: actions,
 	}
-	if err := c.Validate(); err == nil {
-		t.Error("Must be an error, but got nil")
-	}
+	assert.Error(t, c.Validate())
+
 	c = &Config{
 		Actions:        actions,
 		RepeatInterval: time.Minute,
 	}
-	if err := c.Validate(); err == nil {
-		t.Error("Must be an error, but got nil")
-	}
+	assert.Error(t, c.Validate())
+
 	c = &Config{
 		Actions:        actions,
 		RepeatInterval: time.Minute,
 		CommandTimeout: time.Minute,
 	}
-	if err := c.Validate(); err == nil {
-		t.Error("Must be an error, but got nil")
-	}
+	assert.Error(t, c.Validate())
+
 	c.Actions[0].Expr = "query"
-	if err := c.Validate(); err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, c.Validate())
+
 	c.Actions = append(c.Actions, c.Actions[0])
-	if err := c.Validate(); err == nil {
-		t.Error("Must be an error, but got nil")
-	}
+	assert.Error(t, c.Validate())
 }

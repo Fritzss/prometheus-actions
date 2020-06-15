@@ -2,6 +2,8 @@ package main
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStandardizeSpaces(t *testing.T) {
@@ -9,9 +11,8 @@ func TestStandardizeSpaces(t *testing.T) {
 	line 2
 	line 3`
 	out := StandardizeSpaces(input)
-	if out != "line 1 line 2 line 3" {
-		t.Errorf("Failed match string: %s", out)
-	}
+	assert.Equal(t, "line 1 line 2 line 3", out)
+
 	input = `
 	(
         node_filesystem_free{instance="localhost", mountpoint="/var/lib/docker"} /
@@ -19,7 +20,5 @@ func TestStandardizeSpaces(t *testing.T) {
 	) * 100 < 100
 	`
 	out = StandardizeSpaces(input)
-	if out != `( node_filesystem_free{instance="localhost", mountpoint="/var/lib/docker"} / node_filesystem_size{instance="localhost", mountpoint="/var/lib/docker"} ) * 100 < 100` {
-		t.Errorf("Failed match string: %s", out)
-	}
+	assert.Equal(t, `( node_filesystem_free{instance="localhost", mountpoint="/var/lib/docker"} / node_filesystem_size{instance="localhost", mountpoint="/var/lib/docker"} ) * 100 < 100`, out)
 }

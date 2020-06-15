@@ -13,6 +13,7 @@ require (
 	github.com/prometheus/procfs v0.0.0-20190503130316-740c07785007 // indirect
 	github.com/shirou/gopsutil v0.0.0-20190427031343-fa9845945e5b
 	github.com/sirupsen/logrus v1.4.1
+	github.com/stretchr/testify v1.2.2
 	golang.org/x/sys v0.0.0-20190506115046-ca7f33d4116e // indirect
 	gopkg.in/yaml.v2 v2.2.2
 )

@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestGenerateTemplate(t *testing.T) {
 	data := map[string]interface{}{
@@ -28,15 +32,10 @@ func TestGenerateTemplate(t *testing.T) {
 	}
 	for in, out := range tests {
 		result, err := GenerateTemplate(in, "test", data)
-		if err != nil {
-			t.Error(err)
-		}
-		if result != out {
-			t.Errorf("Must be %s, but got %s", out, result)
-		}
+		assert.NoError(t, err)
+		assert.Equal(t, out, result)
 	}
+
 	_, err := GenerateTemplate("{{nil}}", "test", nil)
-	if err == nil {
-		t.Error("Must be an error, but got nil")
-	}
+	assert.Error(t, err)
 }
