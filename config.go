@@ -52,7 +52,7 @@ func (c *Config) Validate() error {
 	if c.CommandTimeout <= time.Second {
 		return errors.New("commandTimeout must be greater than second")
 	}
-	uniqueActions := make(map[string]bool)
+	uniqueActions := make(map[string]struct{})
 	for i, action := range c.Actions {
 		err := action.Validate()
 		if err != nil {
@@ -61,7 +61,7 @@ func (c *Config) Validate() error {
 		if _, ok := uniqueActions[action.Name]; ok {
 			return fmt.Errorf("duplicate of %s action", action.Name)
 		}
-		uniqueActions[action.Name] = true
+		uniqueActions[action.Name] = struct{}{}
 	}
 	return nil
 }
