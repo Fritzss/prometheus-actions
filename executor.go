@@ -44,6 +44,7 @@ func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
 		log:        log,
 		environ:    os.Environ(),
 	}
+	e.addsBuiltinEnvironmentVariables()
 	if err := e.setupFingerprint(); err != nil {
 		return nil, err
 	}
@@ -54,6 +55,13 @@ func NewExecutor(log *logrus.Logger, config *Config) (*Executor, error) {
 		return nil, err
 	}
 	return e, nil
+}
+
+func (e *Executor) addsBuiltinEnvironmentVariables() {
+	envs := []string{
+		"PROMETHEUS_ACTIONS=1",
+	}
+	e.environ = append(e.environ, envs...)
 }
 
 func (e *Executor) compileQueries() error {

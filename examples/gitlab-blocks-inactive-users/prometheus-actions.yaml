@@ -1,0 +1,12 @@
+---
+repeatInterval: 6h
+cooldownPeriod: 1h
+commandTimeout: 5m
+prometheusURL: http://127.0.0.1:9090/
+listenAddress: 0.0.0.0:9333
+actions:
+  - name: GitLabInactiveUsers
+    # Based on https://github.com/leominov/gitlab_activity_exporter metrics
+    expr: gitlab_activity_exporter_user_last_activity_seconds{inactive_group="inactive"}
+    command:
+      - ./blocks-inactive-users.sh
