@@ -23,7 +23,11 @@ for (( i = 0; i < users; i++ )); do
     continue
   fi
 
-  user_id=$(echo "$user_list" | jq -erM .[0].id)
+  if ! user_id=$(echo "$user_list" | jq -erM .[0].id); then
+    echo "Failed to get $name id"
+    continue
+  fi
+
   if ! curl -sfL --header "PRIVATE-TOKEN: $GITLAB_TOKEN" -X POST \
     "$GITLAB_URL/api/v4/users/$user_id/block"; then
     ecoh "Failed to block $name user"
